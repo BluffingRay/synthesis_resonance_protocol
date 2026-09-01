@@ -14,12 +14,11 @@ world, and spend **Essence** on a radial tech tree.
 
 ## 🖼️ Screenshots
 
-_Add screenshots here — drop image files directly into the `screenshots/`
-folder via GitHub (or a local push) and reference them below, e.g.:_
-
-```md
-![Neon City](screenshots/neon-city.png)
-```
+![Screenshot 1](screenshots/1.png)
+![Screenshot 2](screenshots/2.png)
+![Screenshot 3](screenshots/3.png)
+![Screenshot 4](screenshots/4.png)
+![Screenshot 5](screenshots/5.png)
 
 `save.json` is git-ignored user data. The game is best played on a desktop — it
 has both keyboard and mouse support, though there is no mobile support.

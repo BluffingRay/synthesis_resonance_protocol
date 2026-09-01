@@ -3,10 +3,9 @@
 > **⚠️ This is an EXPERIMENT — not a serious product.**
 >
 > The whole point of this project is to stress-test how far Agentic AI can take a
-> game idea on its own: from sketch to a working procedural roguelite. The code,
-> balance, audio, and structure were largely planned and written with agentic
-> tooling. Treat it as a tech demo of what that workflow can produce — not as a
-> polished, sellable game. It works, though. HAHAHAHA.
+> game idea on its own: from sketch to a working procedural roguelite. Treat it
+> as a tech demo of what that workflow can produce — not as a polished, sellable
+> game. It works, though. HAHAHAHA.
 
 A **procedural audiovisual roguelite** built in Python with `pygame`. No art
 assets — every visual and every sound is synthesized from math. Survive six
@@ -15,26 +14,31 @@ world, and spend **Essence** on a radial tech tree.
 
 ## 🖼️ Screenshots
 
-_Add screenshots here! Drop image files into a `screenshots/` folder and
-reference them below, e.g.:_
+_Add screenshots here — drop image files directly into the `screenshots/`
+folder via GitHub (or a local push) and reference them below, e.g.:_
 
 ```md
 ![Neon City](screenshots/neon-city.png)
 ```
 
-`save.json` is git-ignored user data. The game is best played on a desktop with a
-keyboard (there is no mouse / mobile support).
+`save.json` is git-ignored user data. The game is best played on a desktop — it
+has both keyboard and mouse support, though there is no mobile support.
 
 ---
 
 ## 🧪 The Experiment
 
 This repo exists primarily to answer a question: **how well can Agentic AI build
-a complete, balanced, playable game?** The project brief (`AGENTS.md` + the
-handoff doc) defined the vision and constraints; subagents planned the architecture,
-wrote the modules, tuned the difficulty balance with headless simulations, and
-kept a regression suite green. See `AGENTS.md` for the full design rationale,
-balance baselines, and known-issue log.
+a complete, balanced, playable game?**
+
+I pushed the agents with only **vague feature instructions**, and let them do the
+heavy planning. **DeepSeek V4 Flash 0731** did the bulk of the work — planning
+the architecture, writing the modules, tuning the difficulty balance with
+headless simulations, and keeping a regression suite green — driven through both
+**opencode** and **Reasonix**. The project brief (`AGENTS.md` + the handoff doc)
+captured the vision and constraints; the agents turned that into a shippable
+roguelite. See `AGENTS.md` for the full design rationale, balance baselines, and
+known-issue log.
 
 ## 🎮 How to Run
 

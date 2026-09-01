@@ -1,0 +1,110 @@
+===============================================================================
+SYNTHESIS - HANDOFF FOR THE NEW (WSL) OPENCODE SESSION
+Written 2026-08-02. Read this ONESHOT first, then act as MANAGER.
+===============================================================================
+
+PROJECT ROOT (WSL, the authoritative copy now):
+    /home/raymar/SYNTHESIS
+    Python: ./.venv/bin/python   (Python 3.13.14, pygame 2.6.1, numpy 2.5.1)
+
+YOUR ROLE: You are the MANAGER. Do NOT edit game files directly. Dispatch
+subagents (grunt, play-balancer, critic, codebase-architect, vision, etc.)
+which are defined in your ~/.config/opencode/agent/*.md. Verify their work.
+
+-------------------------------------------------------------------------------
+ONE-TIME SETUP IF NOT DONE (run in WSL, BEFORE opencode):
+-------------------------------------------------------------------------------
+    curl -fsSL https://opencode.ai/install | bash
+    mkdir -p ~/.config/opencode/agent
+    cp /mnt/c/Users/Admin/.config/opencode/agent/*.md ~/.config/opencode/agent/
+    [ -f /mnt/c/Users/Admin/.config/opencode/opencode.json ] && \
+      cp /mnt/c/Users/Admin/.config/opencode/opencode.json ~/.config/opencode/
+
+Then OPEN ~/.config/opencode/agent/vision.md and CONFIRM it has:
+    mode: subagent
+    model: opencode/mimo-v2.5-free     (NOTE THE DOT: mimo-v2.5-free)
+If it still shows "mimo-v2-5-free", fix it. That is what makes `vision`
+dispatchable as a subagent type.
+
+The original (Windows) project at C:\Users\Admin\Desktop\SYNTHESIS is STALE.
+I removed/renamed if needed - delete that note if so. Do not edit both trees.
+
+-------------------------------------------------------------------------------
+COMMANDS (run from /home/raymar/SYNTHESIS):
+-------------------------------------------------------------------------------
+    Syntax:        ./.venv/bin/python -c "import ast; [ast.parse(open(f).read()) for f in ('game.py','game_defs.py','game_entities.py','game_audio.py')]; print('syntax OK')"  (adjust f via argparse or a small script; simpler: import each)
+    Boot headless:
+        import game_defs; game_defs.HEADLESS = True
+        import game; g = game.Game(); g.start_game(); g.update(0.016); g.draw()
+    Regression:    ./.venv/bin/python test_regression.py     (MUST stay at 27/27)
+    Sim fast:      ./.venv/bin/python sim_balance.py --fast
+    Sim full:      ./.venv/bin/python sim_balance.py
+Always set g.meta.save_enabled = False in headless tests, or delete save.json
+after. Clean up __pycache__. NEVER commit unless asked.
+
+-------------------------------------------------------------------------------
+OPEN WORK (in priority order). VERIFY each with test_regression = 27/27 +
+syntax + headless boot before moving on.
+-------------------------------------------------------------------------------
+
+1) XP PROGRESSION FEEDBACK LOOP - NOT DONE (the core balance bug).
+   File: game.py line ~265, grant_xp call:  self.grant_xp(e.maxhp * 3)
+   To reach it:   grep -n "grant_xp(e.maxhp" game.py  (find the line).
+   No KILL_XP / BOSS_XP constants exist yet.
+
+   Problem: enemy kill-XP scales with player heat (tankier enemies -> more XP
+   -> faster leveling -> more heat). Positive feedback makes VETERAN (max
+   meta/heat) runs level up constantly (~45/min) after world 1, not incremental.
+
+   APPROVED PLAN:
+   - Replace HP-scaled kill XP with flat, kind-based KILL_XP table in
+     game_defs.py (e.g. {"chaser": 4, "liner": 8, "drifter": 12} - confirm real
+     enemy kind keys). NO heat/HP multiplier.
+   - Add a generous BOSS_XP payoff (~2000-3000+ base per world), also heat-independent.
+   - KEEP the already-committed piecewise xp_next in game_defs.py (lines ~208-210):
+        def xp_next(level):
+            if level <= 8: return int(10 * level ** 1.65)
+            return int(xp_next(8) * (level / 8.0) ** 2.4)
+   - Tune the per-world XP multiplier so VETERAN cadence = about a level every
+     ~30-60s late, while FRESH still gains a level every few kills early.
+   - Assign to orchestrator 'play-balancer' (implements). Update the 2 XP
+     regression asserts in test_regression.py so suite passes.
+   - Re-run sim_balance.py --fast + full; confirm late worlds (3/4) still reach
+     + can kill their boss on veteran, and no level-up deluge. Refresh AGENTS.md
+     balance/progression baseline + Known-Issues log.
+
+2) SKILL TREE -> RADIAL "HUB-AND-BRANCH" layout (part 2, cosmetic + nav).
+   Design APPROVED: a single central hub node; branches CORE, AEGIS, FIELD,
+   VELOCITY radiate OUTWARD; visible web/braid links (center + cross-branch);
+   tier = distance from center (center-out = shallow -> deep / early -> late).
+   KEEP all node data (id, name, desc, pre, cost, levels, colors, info panel,
+   ENTER-to-buy) UNCHANGED. Only layout + navigation change.
+   - Current shop_pos: game.py ~914 (5 columns). Redesign to radial.
+   - Redesign draw_shop links (game.py ~923-975): hub + web/braid + branch
+     labels at the outer tips.
+   - FIX NAV-INVERSION in the SAME change (game.py shop_move ~1217, key handler
+     ~1279-1306): W/UP currently moves cursor DOWN. Use nearest-neighbor
+     selection on newer positions so UP=up, DOWN=down, LEFT/RIGHT=horizontal.
+   - Do NOT touch skill-tree node data (your earlier row: the layout fix must
+     be done in one pass, not twice).
+   - Then re-verify visually with the `vision` subagent (after testing it's
+     dispatchable above) on a screenshot.
+
+3) AGENTS.md refresh:
+   After changes, update AGENTS.md "Current verified balance baselines" and the
+   Known-issues log, so baselines match the new XP progression and the radial
+   tree. Remove stale numbers.
+
+-------------------------------------------------------------------------------
+CONVENTIONS / QUICK REFERENCE
+-------------------------------------------------------------------------------
+- game_defs.py: constants, WORLDS, BOSS_HP, xp_next, Meta (tech tree + save).
+- game_entities.py: Starfield, Glow, Player, Projectile, Enemy, Shard, Boss, Item.
+- game.py: orchestrator (states, camera, gimmicks, boss, items, draw, win).
+- game_audio.py: procedural audio (reads game_defs.HEADLESS).
+- sim_balance.py: provide per-world fresh/veteran/idle battery (12 cores).
+- test_regression.py: 27 checks. MUST stay green after any edit.
+- The venv at Windows was task-checked removed. FIRE the old manager; you're it.
+
+DO NOT edit game.py/game_defs.py/game_entities.py directly. Always dispatch.
+===============================================================================

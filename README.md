@@ -42,7 +42,7 @@ known-issue log.
 
 ## 🎮 How to Run
 
-Requirements: **Python 3.13+**, `pygame`, `numpy`.
+Requirements: **Python 3.13+**, `pygame`, `numpy` (see `requirements.txt`).
 
 ### Windows
 

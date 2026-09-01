@@ -74,7 +74,12 @@ python game.py
 
 ## 📦 Specs
 
-- **Language / stack:** Python 3.13, pygame 2.6, numpy 2.5. Procedural audio, no art assets.
+- **Language / stack:** Python 3.13, pygame 2.6, numpy 2.5.
+- **Assetless by design:** zero image/sound files, zero `pygame.image.load()` /
+  `pygame.mixer.Sound()` calls. Every visual is a `pygame.draw` primitive or a
+  procedurally-generated alpha `Glow` surface; all text uses the system font
+  (`SysFont`); every sound is synthesized from math at runtime. The repo's only
+  binaries would be user-created screenshots.
 - **Genre:** Top-down procedural roguelite (survivor-style).
 - **6 worlds**, linearly unlocked by winning the previous one:
   | World | Waves | Arena | Gimmick |
